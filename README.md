@@ -4,8 +4,8 @@ Sending and fetching JSON data (base64 encoded) with transfer audit logging.
 
 ASP.NET minimal API, with the following initial goal:
  - [x] Database as data store
- - [x] Sending/fetching JSON data
- - [x] Base64 encoded data
+ - [ ] Sending/fetching JSON data
+ - [ ] Base64 encoded data
  - [ ] Transfer audit logging
  - [ ] API versioning -> Asp.Versioning.Http
 
@@ -47,6 +47,8 @@ Migration:
 
 Entity Framework:
 * https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli
+* https://learn.microsoft.com/en-us/ef/core/modeling/keys?tabs=data-annotations
+* https://learn.microsoft.com/en-us/ef/core/modeling/generated-properties?tabs=data-annotations
 
 OpenAPI/Swagger:
 * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/openapi?view=aspnetcore-7.0
