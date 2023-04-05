@@ -96,24 +96,30 @@ public class Program
         // Version 1.0
         app.MapPost("/api/v{version:apiVersion}/transfer", async (HttpRequest request, DataTransferApiLabContext db) => 
         {
-            var transfer = await request.ReadFromJsonAsync<Transfer>();
-            //var transfer = new Transfer();
+            var transferJson = await request.ReadFromJsonAsync<Transfer>();
+            var transfer = new Transfer();
+            transfer.TransferData = transferJson.TransferData;
+
+            //var transfer = await request.ReadFromJsonAsync<Transfer>();
+
             transfer.TransferData = Base64Decode(transfer.TransferData);
 
             db.Transfers.Add(transfer);
             await db.SaveChangesAsync();
 
-            //return Results.Created($"/api/v1/transfer/{transfer.TransferId}", transfer);
             var scheme = request.Scheme;
             var host = request.Host;
             var version = request.HttpContext.GetRequestedApiVersion();
-            var location = new Uri( $"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/people/{transfer.TransferId}" );
+            var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/transfer/{transfer.TransferId}");
             return Results.Created(location, transfer);
-            //return Results.Json(data: transfer, statusCode: 201);
         })
         .Accepts<Transfer>("application/json")
         .Produces<Transfer>(201)
         .Produces(400)
+        .WithOpenApi(operation => new(operation) {
+            Summary = "Send base64 encoded data",
+            Description = "Accepts base64 encoded data in a JSON payload."
+        })
         .WithApiVersionSet(versionSet)
         .MapToApiVersion(1.0);
 
@@ -121,10 +127,15 @@ public class Program
         {
             Transfer transfer = await db.Transfers.FindAsync(id);
             transfer.TransferData = Base64Encode(transfer.TransferData);
-            return transfer;
+
+            return Results.Json(transfer);
         })
         .Produces<Transfer>(200)
         .Produces(400)
+        .WithOpenApi(operation => new(operation) {
+            Summary = "Fetch base64 encoded data",
+            Description = "Sends base64 encoded data in a JSON payload."
+        })
         .WithApiVersionSet(versionSet)
         .MapToApiVersion(1.0);
 
