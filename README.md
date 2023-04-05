@@ -50,20 +50,24 @@ Migration:
 
 ### C# and ASP.NET
 
+#### Minimal API & Base64
+
 * https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-7.0&tabs=visual-studio-code
 * https://stackoverflow.com/questions/11743160/how-do-i-encode-and-decode-a-base64-string
 
-**Entity Framework**
+#### Entity Framework
+
 * https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli
 * https://learn.microsoft.com/en-us/ef/core/modeling/keys?tabs=data-annotations
 * https://learn.microsoft.com/en-us/ef/core/modeling/generated-properties?tabs=data-annotations
+
 Concern regarding protecting Id (primary key) not to be overridden:
 * https://stackoverflow.com/questions/26768695/can-private-setters-be-used-in-an-entity-model
 
-OpenAPI/Swagger:
+#### OpenAPI/Swagger
 * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/openapi?view=aspnetcore-7.0
 
-API versioning:
+#### API versioning
 * https://www.nuget.org/packages/Asp.Versioning.Http
 * https://github.com/dotnet/aspnet-api-versioning/tree/3857a332057d970ad11bac0edfdbff8a559a215d/examples/AspNetCore/WebApi/MinimalApiExample
 
