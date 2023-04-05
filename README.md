@@ -2,14 +2,16 @@
 
 Sending and fetching JSON data (base64 encoded) with transfer audit logging.
 
+It expects to receive base64 encoded data in a JSON payload. \
+It will decode any base64 data received and store it in a database. \
+On request it will return base64 encoded data in a JSON payload.
+
 ASP.NET minimal API, with the following initial goal:
  - [x] Database as data store
- - [x] Sending/fetching JSON data
- - [x] Base64 encoded data
- - [ ] Transfer audit logging
+ - [x] Send/fetch JSON data
+ - [x] Base64 data encoding/decoding
  - [ ] API versioning -> Asp.Versioning.Http
-
-Keeping it intentionally as a single file program due to its small size.
+ - [ ] Transfer audit logging
 
 ## Usage
 
@@ -25,6 +27,12 @@ Keeping it intentionally as a single file program due to its small size.
     ~~~json
     {
         "transferData": "<base64 encoded string>"
+    }
+    ~~~
+    some data in the air -> base64 -> c29tZSBkYXRhIGluIHRoZSBhaXIK
+    ~~~json
+    {
+        "transferData": "c29tZSBkYXRhIGluIHRoZSBhaXIK"
     }
     ~~~
 
@@ -45,8 +53,12 @@ Migration:
 * https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api?view=aspnetcore-7.0&tabs=visual-studio-code
 * https://stackoverflow.com/questions/11743160/how-do-i-encode-and-decode-a-base64-string
 
-Entity Framework:
+**Entity Framework**
 * https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/?tabs=dotnet-core-cli
+* https://learn.microsoft.com/en-us/ef/core/modeling/keys?tabs=data-annotations
+* https://learn.microsoft.com/en-us/ef/core/modeling/generated-properties?tabs=data-annotations
+Concern regarding protecting Id (primary key) not to be overridden:
+* https://stackoverflow.com/questions/26768695/can-private-setters-be-used-in-an-entity-model
 
 OpenAPI/Swagger:
 * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/openapi?view=aspnetcore-7.0
