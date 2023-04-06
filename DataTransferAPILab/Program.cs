@@ -99,18 +99,21 @@ public class Program
             var transferJson = await request.ReadFromJsonAsync<Transfer>();
             var transfer = new Transfer();
             transfer.TransferData = transferJson.TransferData;
-
-            //var transfer = await request.ReadFromJsonAsync<Transfer>();
-
             transfer.TransferData = Base64Decode(transfer.TransferData);
 
+            var audit = new Audit();
+            audit.Date = DateTime.Now.ToString();
+            audit.Event = "Post";
+
             db.Transfers.Add(transfer);
+            db.Audits.Add(audit);
             await db.SaveChangesAsync();
 
             var scheme = request.Scheme;
             var host = request.Host;
             var version = request.HttpContext.GetRequestedApiVersion();
-            var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/transfer/{transfer.TransferId}");
+            var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/transfer/{transfer.Id}");
+
             return Results.Created(location, transfer);
         })
         .Accepts<Transfer>("application/json")
