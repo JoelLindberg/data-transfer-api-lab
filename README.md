@@ -9,9 +9,10 @@ On request it will return base64 encoded data in a JSON payload.
 ASP.NET minimal API, with the following initial goal:
  - [x] Database as data store
  - [x] Send/fetch JSON data
+ - [ ] Delete data
  - [x] Base64 data encoding/decoding
  - [ ] API versioning -> Asp.Versioning.Http
- - [ ] Transfer audit logging
+ - [x] Transfer audit logging
 
 ## Usage
 
@@ -63,6 +64,9 @@ Migration:
 
 Concern regarding protecting Id (primary key) not to be overridden:
 * https://stackoverflow.com/questions/26768695/can-private-setters-be-used-in-an-entity-model
+
+Select specific columns using entity framework:
+* https://www.brentozar.com/archive/2016/09/select-specific-columns-entity-framework-query/
 
 #### OpenAPI/Swagger
 * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/openapi?view=aspnetcore-7.0
