@@ -11,4 +11,5 @@ public class DataTransferApiLabContext : DbContext
         : base(options) { }
 
     public DbSet<Transfer> Transfers { get; set; }
+    public DbSet<Audit> Audits { get; set; }
 }
