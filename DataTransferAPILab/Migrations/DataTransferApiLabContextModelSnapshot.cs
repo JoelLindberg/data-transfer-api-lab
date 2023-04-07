@@ -18,31 +18,47 @@ namespace DataTransferApiLab.Migrations
 
             modelBuilder.Entity("DataTransferApiLab.Models.Audit", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("AuditId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Date")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Event")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Bytes")
+                        .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Timestamp")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(19)");
+
+                    b.Property<int>("TransferDataId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransferName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("AuditId");
 
                     b.ToTable("Audits");
                 });
 
             modelBuilder.Entity("DataTransferApiLab.Models.Transfer", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TransferDataId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TransferData")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(500000)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("TransferName")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("TransferDataId");
 
                     b.ToTable("Transfers");
                 });

@@ -6,7 +6,6 @@ using Asp.Versioning;
 using DataTransferApiLab.Models;
 using DataTransferApiLab.Data;
 
-
 namespace DataTransferApiLab;
 
 
@@ -24,6 +23,7 @@ public class Program
         var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
         return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
     }
+
 
 
     public static void Main(string[] args)
@@ -58,8 +58,6 @@ public class Program
         } );
 
         // Swagger
-        //builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-        //builder.Services.AddSwaggerGen( options => options.OperationFilter<SwaggerDefaultValues>() );
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "Data Transfer API Lab", Description = "Integrate your data", Version = "v1" });
@@ -88,31 +86,38 @@ public class Program
         });
 
 
+
         app.MapGet("/", () => Results.Redirect("/swagger"))
-                                     .WithApiVersionSet( versionSet )
+                                     .WithApiVersionSet(versionSet)
                                      .IsApiVersionNeutral()
                                      .ExcludeFromDescription();
 
         // Version 1.0
+        
+        // Upload
         app.MapPost("/api/v{version:apiVersion}/transfer", async (HttpRequest request, DataTransferApiLabContext db) => 
         {
-            var transferJson = await request.ReadFromJsonAsync<Transfer>();
+            var transferTmp = await request.ReadFromJsonAsync<Transfer>();
             var transfer = new Transfer();
-            transfer.TransferData = transferJson.TransferData;
+            transfer.TransferName = transferTmp.TransferName;
+            transfer.TransferData = transferTmp.TransferData;
             transfer.TransferData = Base64Decode(transfer.TransferData);
+            db.Transfers.Add(transfer);
+            await db.SaveChangesAsync();
 
             var audit = new Audit();
-            audit.Date = DateTime.Now.ToString();
-            audit.Event = "Post";
-
-            db.Transfers.Add(transfer);
+            audit.TransferDataId = transfer.TransferDataId;
+            audit.TransferName = transfer.TransferName;
+            audit.Timestamp = DateTime.Now.ToString();
+            audit.Action = "Upload";
+            audit.Bytes = System.Text.ASCIIEncoding.UTF8.GetByteCount(transfer.TransferData);
             db.Audits.Add(audit);
             await db.SaveChangesAsync();
 
             var scheme = request.Scheme;
             var host = request.Host;
             var version = request.HttpContext.GetRequestedApiVersion();
-            var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/v{version}/api/transfer/{transfer.Id}");
+            var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/api/v{version}/transfer/{transfer.TransferDataId}");
 
             return Results.Created(location, transfer);
         })
@@ -126,10 +131,22 @@ public class Program
         .WithApiVersionSet(versionSet)
         .MapToApiVersion(1.0);
 
+
+        // Download
         app.MapGet("/api/v{version:apiVersion}/transfer/{id}", async (int id, DataTransferApiLabContext db) => 
         {
+            var audit = new Audit();
             Transfer transfer = await db.Transfers.FindAsync(id);
+            audit.Bytes = System.Text.ASCIIEncoding.UTF8.GetByteCount(transfer.TransferData); // byte count when not base64 encoded
             transfer.TransferData = Base64Encode(transfer.TransferData);
+
+            audit.TransferDataId = transfer.TransferDataId;
+            audit.TransferName = transfer.TransferName;
+            audit.Timestamp = DateTime.Now.ToString();
+            audit.Action = "Download";
+            
+            db.Audits.Add(audit);
+            await db.SaveChangesAsync();
 
             return Results.Json(transfer);
         })
@@ -143,20 +160,49 @@ public class Program
         .MapToApiVersion(1.0);
 
 
+        // Delete
+
+
+        // Fetch transfer audit logs
+        app.MapGet("/api/v{version:apiVersion}/audit", async (DataTransferApiLabContext db) => 
+        {
+            var audits = await db.Audits.ToListAsync();
+
+            return Results.Json(audits);
+        })
+        .Produces<Audit>(200)
+        .Produces(400)
+        .WithOpenApi(operation => new(operation) {
+            Summary = "Get all transfer logs",
+            Description = "Fetches all transfer events from the transfer audit logs."
+        })
+        .WithApiVersionSet(versionSet)
+        .MapToApiVersion(1.0);
+
+
+        // View currently stored transfer data
+        app.MapGet("/api/v{version:apiVersion}/transfer", async (DataTransferApiLabContext db) => {
+            var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName }).ToListAsync();
+            return Results.Json(transfers);
+        })
+        .Produces<Audit>(200)
+        .Produces(400)
+        .WithOpenApi(operation => new(operation) {
+            Summary = "View all stored data",
+            Description = "Returns an overview of all stored transfer data."
+        })
+        .WithApiVersionSet(versionSet)
+        .MapToApiVersion(1.0);
+
+
+
+
         // Version 2.0
-        
+
         // Add version 2 here ...
 
 
 
-        // Debug - Get all transfers as text
-        app.MapGet("/api/transfer", async (DataTransferApiLabContext db) =>
-        {
-            List<Transfer> transfers = await db.Transfers.ToListAsync();
-            return transfers;
-        })
-        .WithApiVersionSet( versionSet )
-        .IsApiVersionNeutral();
 
         app.Run();
     }
