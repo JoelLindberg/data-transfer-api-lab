@@ -17,3 +17,16 @@ public class Transfer
     [Column(TypeName = "varchar(500000)")]
     public string TransferData { get; set; }
 }
+
+public class TransferUploadResponse
+{
+    public int TransferDataId { get; set; }
+    public string TransferName { get; set; }
+}
+
+public class TransferDownloadResponse
+{
+    public int TransferDataId { get; set; }
+    public string TransferName { get; set; }
+    public string TransferData { get; set; }
+}

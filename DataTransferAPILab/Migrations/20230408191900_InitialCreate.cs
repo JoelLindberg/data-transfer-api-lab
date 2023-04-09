@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace DataTransferApiLab.Migrations
+namespace DataTransferAPILab.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

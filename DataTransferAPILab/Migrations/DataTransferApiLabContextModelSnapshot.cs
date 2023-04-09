@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DataTransferApiLab.Migrations
+namespace DataTransferAPILab.Migrations
 {
     [DbContext(typeof(DataTransferApiLabContext))]
     partial class DataTransferApiLabContextModelSnapshot : ModelSnapshot

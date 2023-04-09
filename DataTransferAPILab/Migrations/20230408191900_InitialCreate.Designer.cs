@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DataTransferApiLab.Migrations
+namespace DataTransferAPILab.Migrations
 {
     [DbContext(typeof(DataTransferApiLabContext))]
-    [Migration("20230407161155_InitialCreate")]
+    [Migration("20230408191900_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

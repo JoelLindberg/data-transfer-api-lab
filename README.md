@@ -9,10 +9,10 @@ On request it will return base64 encoded data in a JSON payload.
 ASP.NET minimal API, with the following initial goal:
  - [x] Database as data store
  - [x] Send/fetch JSON data
- - [ ] Delete data
  - [x] Base64 data encoding/decoding
- - [ ] API versioning -> Asp.Versioning.Http
  - [x] Transfer audit logging
+ - [x] API versioning -> Asp.Versioning.Http
+ - [ ] Delete data request added in v2
 
 ## Usage
 
@@ -49,6 +49,8 @@ Migration:
 
 ## Resources
 
+Self notes. Not sure these links can be of help to someone else. They are not specified in any specific order. They are resources I resorted to frequently or for specific one-time problems when getting stuck.
+
 ### C# and ASP.NET
 
 #### Minimal API & Base64
@@ -68,12 +70,22 @@ Concern regarding protecting Id (primary key) not to be overridden:
 Select specific columns using entity framework:
 * https://www.brentozar.com/archive/2016/09/select-specific-columns-entity-framework-query/
 
-#### OpenAPI/Swagger
+#### Swagger/OpenAPI (Swashbuckle implementation)
+* https://learn.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?view=aspnetcore-7.0
 * https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/openapi?view=aspnetcore-7.0
+* https://stackoverflow.com/questions/60186760/how-can-i-specify-the-default-opening-version-of-swagger
 
 #### API versioning
 * https://www.nuget.org/packages/Asp.Versioning.Http
 * https://github.com/dotnet/aspnet-api-versioning/tree/3857a332057d970ad11bac0edfdbff8a559a215d/examples/AspNetCore/WebApi/MinimalApiExample
+* https://stackoverflow.com/questions/58834430/c-sharp-net-core-swagger-trying-to-use-multiple-api-versions-but-all-end-point
+
+#### Logging (middleware)
+* https://learn.microsoft.com/en-us/answers/questions/1109851/asp-net-core-web-api-how-to-log-requests-and-respo
+* https://www.devtrends.co.uk/blog/conditional-middleware-based-on-request-in-asp.net-core
+* https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/how-to?pivots=dotnet-8-0
+* https://learn.microsoft.com/en-us/aspnet/core/fundamentals/middleware/?view=aspnetcore-7.0
+* https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/middleware?view=aspnetcore-7.0
 
 ### SQLite
 
