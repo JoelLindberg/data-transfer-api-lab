@@ -46,7 +46,7 @@ ASP.NET minimal API, with the following initial goal:
 
     *transferData: "some data in the air" -> base64 -> c29tZSBkYXRhIGluIHRoZSBhaXIK*
 
-5. Explore the other API resouces via Swagger UI: `http://localhost:5264`
+5. Explore the other API resources via Swagger UI: `http://localhost:5264`
 
     ![Flow](https://github.com/joellindberg/data-transfer-api-lab/raw/main/images/api-swagger-ui.png)
 
