@@ -51,7 +51,11 @@ namespace DataTransferAPILab.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Bytes")
+                        .HasColumnType("int");
+
                     b.Property<string>("TransferData")
+                        .IsRequired()
                         .HasColumnType("varchar(500000)");
 
                     b.Property<string>("TransferName")

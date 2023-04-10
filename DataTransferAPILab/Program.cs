@@ -85,21 +85,12 @@ public class Program
 
         // Upload
         app.MapPost("/api/v{version:apiVersion}/transfer", async (HttpRequest request, DataTransferApiLabContext db) => {
-            var transferTmp = await request.ReadFromJsonAsync<Transfer>();
+            var receivedPayload = await request.ReadFromJsonAsync<Transfer>();
             var transfer = new Transfer();
-            transfer.TransferName = transferTmp.TransferName;
-            transfer.TransferData = transferTmp.TransferData;
-            transfer.TransferData = Utils.Base64.Base64Decode(transfer.TransferData);
+            transfer.TransferName = receivedPayload.TransferName;
+            transfer.TransferData = Utils.Base64.Base64Decode(receivedPayload.TransferData);
+            transfer.SetBytes(System.Text.ASCIIEncoding.UTF8.GetByteCount(transfer.TransferData));
             db.Transfers.Add(transfer);
-            await db.SaveChangesAsync();
-
-            var audit = new Audit();
-            audit.TransferDataId = transfer.TransferDataId;
-            audit.TransferName = transfer.TransferName;
-            audit.Timestamp = DateTime.Now.ToString();
-            audit.Action = "Upload";
-            audit.Bytes = System.Text.ASCIIEncoding.UTF8.GetByteCount(transfer.TransferData);
-            db.Audits.Add(audit);
             await db.SaveChangesAsync();
 
             var scheme = request.Scheme;
@@ -107,10 +98,15 @@ public class Program
             var version = request.HttpContext.GetRequestedApiVersion();
             var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/api/v{version}/transfer/{transfer.TransferDataId}");
 
-            return Results.Created(location, transfer);
+            var response = new TransferUploadResponse();
+            response.TransferDataId = transfer.TransferDataId;
+            response.TransferName = transfer.TransferName;
+            response.Bytes = transfer.Bytes;
+
+            return Results.Json(response);
         })
         .Accepts<Transfer>("application/json")
-        .Produces<Transfer>(201)
+        .Produces<TransferUploadResponse>(201)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Send base64 encoded data",
@@ -122,24 +118,17 @@ public class Program
 
 
         // Download
-        app.MapGet("/api/v{version:apiVersion}/transfer/{id}", async (int id, DataTransferApiLabContext db) => 
-        {
-            var audit = new Audit();
+        app.MapGet("/api/v{version:apiVersion}/transfer/{id}", async (int id, DataTransferApiLabContext db) => {
             Transfer transfer = await db.Transfers.FindAsync(id);
-            audit.Bytes = System.Text.ASCIIEncoding.UTF8.GetByteCount(transfer.TransferData); // byte count when not base64 encoded
-            transfer.TransferData = Utils.Base64.Base64Encode(transfer.TransferData);
+            var transferDownloadResponse = new TransferDownloadResponse();
+            transferDownloadResponse.TransferDataId = transfer.TransferDataId;
+            transferDownloadResponse.TransferName = transfer.TransferName;
+            transferDownloadResponse.TransferData = Utils.Base64.Base64Encode(transfer.TransferData);
+            transferDownloadResponse.Bytes = transfer.Bytes;
 
-            audit.TransferDataId = transfer.TransferDataId;
-            audit.TransferName = transfer.TransferName;
-            audit.Timestamp = DateTime.Now.ToString();
-            audit.Action = "Download";
-            
-            db.Audits.Add(audit);
-            await db.SaveChangesAsync();
-
-            return Results.Json(transfer);
+            return Results.Json(transferDownloadResponse);
         })
-        .Produces<Transfer>(200)
+        .Produces<TransferDownloadResponse>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Fetch base64 encoded data",
@@ -151,8 +140,7 @@ public class Program
 
 
         // Fetch transfer audit logs
-        app.MapGet("/api/v{version:apiVersion}/audit", async (DataTransferApiLabContext db) => 
-        {
+        app.MapGet("/api/v{version:apiVersion}/audits", async (DataTransferApiLabContext db) => {
             var audits = await db.Audits.ToListAsync();
 
             return Results.Json(audits);
@@ -169,11 +157,11 @@ public class Program
 
 
         // View currently stored transfer data
-        app.MapGet("/api/v{version:apiVersion}/transfer", async (DataTransferApiLabContext db) => {
-            var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName }).ToListAsync();
+        app.MapGet("/api/v{version:apiVersion}/transfers", async (DataTransferApiLabContext db) => {
+            var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName, i.Bytes }).ToListAsync();
             return Results.Json(transfers);
         })
-        .Produces<Audit>(200)
+        .Produces<TransferUploadResponse>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "View all stored data",
@@ -193,8 +181,8 @@ public class Program
             var receivedPayload = await request.ReadFromJsonAsync<Transfer>();
             var transfer = new Transfer();
             transfer.TransferName = receivedPayload.TransferName;
-            transfer.TransferData = receivedPayload.TransferData;
-            transfer.TransferData = Utils.Base64.Base64Decode(transfer.TransferData);
+            transfer.TransferData = Utils.Base64.Base64Decode(receivedPayload.TransferData);
+            transfer.SetBytes(System.Text.ASCIIEncoding.UTF8.GetByteCount(transfer.TransferData));
             db.Transfers.Add(transfer);
             await db.SaveChangesAsync();
 
@@ -206,6 +194,7 @@ public class Program
             var response = new TransferUploadResponse();
             response.TransferDataId = transfer.TransferDataId;
             response.TransferName = transfer.TransferName;
+            response.Bytes = transfer.Bytes;
 
             return Results.Json(response);
         })
@@ -228,6 +217,7 @@ public class Program
             transferDownloadResponse.TransferDataId = transfer.TransferDataId;
             transferDownloadResponse.TransferName = transfer.TransferName;
             transferDownloadResponse.TransferData = Utils.Base64.Base64Encode(transfer.TransferData);
+            transferDownloadResponse.Bytes = transfer.Bytes;
 
             return Results.Json(transferDownloadResponse);
         })
@@ -264,10 +254,10 @@ public class Program
 
         // View currently stored transfer data
         app.MapGet("/api/v{version:apiVersion}/transfers", async (DataTransferApiLabContext db) => {
-            var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName }).ToListAsync();
+            var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName, i.Bytes }).ToListAsync();
             return Results.Json(transfers);
         })
-        .Produces<Audit>(200)
+        .Produces<TransferUploadResponse>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "View all stored data",

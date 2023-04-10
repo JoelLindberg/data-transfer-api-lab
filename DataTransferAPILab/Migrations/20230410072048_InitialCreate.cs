@@ -34,7 +34,8 @@ namespace DataTransferAPILab.Migrations
                     TransferDataId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     TransferName = table.Column<string>(type: "varchar(50)", nullable: false),
-                    TransferData = table.Column<string>(type: "varchar(500000)", nullable: true)
+                    TransferData = table.Column<string>(type: "varchar(500000)", nullable: false),
+                    Bytes = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

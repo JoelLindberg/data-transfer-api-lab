@@ -19,16 +19,12 @@ public class RequestResponseLogger
     {
         var apiVersion = httpContext.GetRequestedApiVersion();
 
-        if (httpContext.Request.Path.StartsWithSegments($"/api/v{apiVersion}/transfer") && httpContext.Request.Method == "POST") {
+        if (httpContext.Request.Path == $"/api/v{apiVersion}/transfer" && httpContext.Request.Method == "POST") {
             var jsonOptions = new JsonSerializerOptions();
             jsonOptions.PropertyNameCaseInsensitive = true;
 
             var requestBody = await ReadBodyFromRequest(httpContext.Request);
             var receivedPayload = JsonSerializer.Deserialize<Transfer>(requestBody, jsonOptions);
-            //Console.WriteLine(receivedPayload.TransferName);
-            //Console.WriteLine(receivedPayload.TransferData);
-
-            var transferDataSize = System.Text.ASCIIEncoding.UTF8.GetByteCount(receivedPayload.TransferData);
 
             // Temporarily replace the HttpResponseStream, which is a write-only stream, with a MemoryStream to capture it's value in-flight.  
             var originalResponseBody = httpContext.Response.Body;
@@ -48,7 +44,7 @@ public class RequestResponseLogger
             audit.TransferDataId = sentResponse.TransferDataId;
             audit.Timestamp = DateTime.Now.ToString();
             audit.Action = "Upload";
-            audit.Bytes = transferDataSize;
+            audit.Bytes = sentResponse.Bytes;
             db.Audits.Add(audit);
             await db.SaveChangesAsync();
 
@@ -72,14 +68,13 @@ public class RequestResponseLogger
             var responseBody = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
 
             var sentResponse = JsonSerializer.Deserialize<TransferDownloadResponse>(responseBody, jsonOptions);
-            var transferDataSize = System.Text.ASCIIEncoding.UTF8.GetByteCount(sentResponse.TransferData);
 
             var audit = new Audit();
             audit.TransferName = sentResponse.TransferName;
             audit.TransferDataId = sentResponse.TransferDataId;
             audit.Timestamp = DateTime.Now.ToString();
             audit.Action = "Download";
-            audit.Bytes = transferDataSize;
+            audit.Bytes = sentResponse.Bytes;
             db.Audits.Add(audit);
             await db.SaveChangesAsync();
 

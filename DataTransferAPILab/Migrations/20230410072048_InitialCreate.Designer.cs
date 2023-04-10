@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataTransferAPILab.Migrations
 {
     [DbContext(typeof(DataTransferApiLabContext))]
-    [Migration("20230408191900_InitialCreate")]
+    [Migration("20230410072048_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -54,7 +54,11 @@ namespace DataTransferAPILab.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Bytes")
+                        .HasColumnType("int");
+
                     b.Property<string>("TransferData")
+                        .IsRequired()
                         .HasColumnType("varchar(500000)");
 
                     b.Property<string>("TransferName")
