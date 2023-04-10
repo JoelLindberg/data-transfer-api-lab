@@ -12,7 +12,7 @@ ASP.NET minimal API, with the following initial goal:
  - [x] Base64 data encoding/decoding
  - [x] Transfer audit logging
  - [x] API versioning -> Asp.Versioning.Http
- - [ ] Delete data request added in v2
+ - [x] Delete data request added in v2
 
 ## Usage
 
