@@ -14,28 +14,44 @@ ASP.NET minimal API, with the following initial goal:
  - [x] API versioning -> Asp.Versioning.Http
  - [x] Delete data request added in v2
 
+<br />
+
 ## Usage
 
-1. dotnet restore
-2. dotnet ef database update
-3. dotnet run
-4. send json data
-    ~~~shell
-    curl -d "@data.json" -X POST http://localhost:5063/v1/transfer
+1. `dotnet restore`
+2. `dotnet ef database update`
+3. `dotnet run`
+4. Try uploading some json data (base64 encoded):
+    
+    Windows (curl.exe can also be used):
+    ~~~powershell
+    $headers=@{}
+    $headers.Add("Content-Type", "application/json")
+    $response = Invoke-RestMethod -Uri 'http://localhost:5264/api/v2/transfer' -Method POST -Headers $headers -ContentType 'application/json' -Body '{
+    "transferName": "job01-data01",
+    "transferData": "c29tZSBkYXRhIGluIHRoZSBhaXIK"
+    }'
     ~~~
 
-    data.json
-    ~~~json
-    {
-        "transferData": "<base64 encoded string>"
-    }
+    Linux:
+    ~~~shell
+    curl --request POST \
+    --url http://localhost:5264/api/v2/transfer \
+    --header 'Content-Type: application/json' \
+    --data '{
+    "transferName": "job01-data01",
+    "transferData": "c29tZSBkYXRhIGluIHRoZSBhaXIK"
+    }'
     ~~~
-    some data in the air -> base64 -> c29tZSBkYXRhIGluIHRoZSBhaXIK
-    ~~~json
-    {
-        "transferData": "c29tZSBkYXRhIGluIHRoZSBhaXIK"
-    }
-    ~~~
+
+    *transferData: "some data in the air" -> base64 -> c29tZSBkYXRhIGluIHRoZSBhaXIK*
+
+5. Explore the other API resouces via Swagger UI: `http://localhost:5264`
+
+    ![Flow](https://github.com/joellindberg/data-transfer-api-lab/raw/main/images/api-swagger-ui.png)
+
+<br />
+<br />
 
 ## Entity Framework
 
@@ -46,6 +62,9 @@ Migration:
 > dotnet ef migrations add InitialCreate
 > dotnet ef database update
 ~~~
+
+<br />
+<br />
 
 ## Resources
 
