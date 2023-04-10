@@ -55,7 +55,6 @@ namespace DataTransferAPILab.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TransferData")
-                        .IsRequired()
                         .HasColumnType("varchar(500000)");
 
                     b.Property<string>("TransferName")

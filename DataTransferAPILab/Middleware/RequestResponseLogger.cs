@@ -37,7 +37,7 @@ public class RequestResponseLogger
             newResponseBody.Seek(0, SeekOrigin.Begin);
             var responseBody = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
 
-            var sentResponse = JsonSerializer.Deserialize<TransferUploadResponse>(responseBody, jsonOptions);
+            var sentResponse = JsonSerializer.Deserialize<TransferResponse>(responseBody, jsonOptions);
 
             var audit = new Audit();
             audit.TransferName = sentResponse.TransferName;
@@ -74,6 +74,36 @@ public class RequestResponseLogger
             audit.TransferDataId = sentResponse.TransferDataId;
             audit.Timestamp = DateTime.Now.ToString();
             audit.Action = "Download";
+            audit.Bytes = sentResponse.Bytes;
+            db.Audits.Add(audit);
+            await db.SaveChangesAsync();
+
+            newResponseBody.Seek(0, SeekOrigin.Begin);
+            await newResponseBody.CopyToAsync(originalResponseBody);
+        }
+        else if (httpContext.Request.Path.StartsWithSegments($"/api/v{apiVersion}/transfer") && httpContext.Request.Method == "DELETE")
+        {
+            var jsonOptions = new JsonSerializerOptions();
+            jsonOptions.PropertyNameCaseInsensitive = true;
+
+            // Temporarily replace the HttpResponseStream, which is a write-only stream, with a MemoryStream to capture it's value in-flight.  
+            var originalResponseBody = httpContext.Response.Body;
+            using var newResponseBody = new MemoryStream();
+            httpContext.Response.Body = newResponseBody;
+
+            // Call the next middleware in the pipeline  
+            await _next(httpContext);
+
+            newResponseBody.Seek(0, SeekOrigin.Begin);
+            var responseBody = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
+
+            var sentResponse = JsonSerializer.Deserialize<TransferResponse>(responseBody, jsonOptions);
+
+            var audit = new Audit();
+            audit.TransferName = sentResponse.TransferName;
+            audit.TransferDataId = sentResponse.TransferDataId;
+            audit.Timestamp = DateTime.Now.ToString();
+            audit.Action = "Delete";
             audit.Bytes = sentResponse.Bytes;
             db.Audits.Add(audit);
             await db.SaveChangesAsync();

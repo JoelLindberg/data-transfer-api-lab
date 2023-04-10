@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+
 namespace DataTransferApiLab.Models;
 
 
@@ -14,7 +15,6 @@ public class Transfer
     [Column(TypeName = "varchar(50)")]
     public string TransferName { get; set; }
 
-    [Required]
     [Column(TypeName = "varchar(500000)")]
     public string TransferData { get; set; }
 
@@ -27,7 +27,7 @@ public class Transfer
     }
 }
 
-public class TransferUploadResponse
+public class TransferResponse
 {
     public int TransferDataId { get; set; }
     public string TransferName { get; set; }
