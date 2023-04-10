@@ -72,6 +72,7 @@ public class Program
         {
             options.SwaggerEndpoint("/swagger/v2/swagger.json", "Data Transfer API Lab v2");
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "Data Transfer API Lab v1");
+            options.DefaultModelsExpandDepth(-1); // hide schemas from the main swagger ui page
         });
 
         app.UseMiddleware<RequestResponseLogger>();
@@ -98,7 +99,7 @@ public class Program
             var version = request.HttpContext.GetRequestedApiVersion();
             var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/api/v{version}/transfer/{transfer.TransferDataId}");
 
-            var response = new TransferUploadResponse();
+            var response = new TransferResponse();
             response.TransferDataId = transfer.TransferDataId;
             response.TransferName = transfer.TransferName;
             response.Bytes = transfer.Bytes;
@@ -106,7 +107,7 @@ public class Program
             return Results.Json(response);
         })
         .Accepts<Transfer>("application/json")
-        .Produces<TransferUploadResponse>(201)
+        .Produces<TransferResponse>(201)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Send base64 encoded data",
@@ -161,7 +162,7 @@ public class Program
             var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName, i.Bytes }).ToListAsync();
             return Results.Json(transfers);
         })
-        .Produces<TransferUploadResponse>(200)
+        .Produces<TransferResponse>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "View all stored data",
@@ -191,7 +192,7 @@ public class Program
             var version = request.HttpContext.GetRequestedApiVersion();
             var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/api/v{version}/transfer/{transfer.TransferDataId}");
 
-            var response = new TransferUploadResponse();
+            var response = new TransferResponse();
             response.TransferDataId = transfer.TransferDataId;
             response.TransferName = transfer.TransferName;
             response.Bytes = transfer.Bytes;
@@ -199,7 +200,7 @@ public class Program
             return Results.Json(response);
         })
         .Accepts<Transfer>("application/json")
-        .Produces<TransferUploadResponse>(201)
+        .Produces<TransferResponse>(201)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Send base64 encoded data",
@@ -232,7 +233,30 @@ public class Program
         .WithGroupName("v2");
 
 
-        // Delete
+        // Delete stored transfer data
+        app.MapDelete("/api/v{version:apiVersion}/transfer/{id}", async (int id, DataTransferApiLabContext db) => {
+            var transfer = await db.Transfers
+                                   .Where(p => p.TransferDataId == id)
+                                   .SingleAsync();
+            db.Remove(transfer);
+            await db.SaveChangesAsync();
+
+            var transferResponse = new TransferResponse();
+            transferResponse.TransferDataId = transfer.TransferDataId;
+            transferResponse.TransferName = transfer.TransferName;
+            transferResponse.Bytes = transfer.Bytes;
+
+            return Results.Json(transferResponse);
+        })
+        .Produces<TransferResponse>(200)
+        .Produces(400)
+        .WithOpenApi(operation => new(operation) {
+            Summary = "Remove stored transfer data",
+            Description = "Removes the requested stored data."
+        })
+        .WithApiVersionSet(versionSet)
+        .MapToApiVersion(2.0)
+        .WithGroupName("v2");
 
 
         // Fetch transfer audit logs
@@ -257,7 +281,7 @@ public class Program
             var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName, i.Bytes }).ToListAsync();
             return Results.Json(transfers);
         })
-        .Produces<TransferUploadResponse>(200)
+        .Produces<TransferResponse>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "View all stored data",
@@ -273,8 +297,3 @@ public class Program
         app.Run();
     }
 }
-
-
-
-
-
