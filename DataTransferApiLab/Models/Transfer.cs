@@ -28,15 +28,14 @@ public class Transfer
     }
 }
 
-public class TransferResponse
-
+public class TransferDto
 {
     public int TransferDataId { get; set; }
     public string TransferName { get; set; }
     public int Bytes { get; set; }
 }
 
-public class TransferDownloadResponse
+public class TransferDownloadDto
 {
     public int TransferDataId { get; set; }
     public string TransferName { get; set; }

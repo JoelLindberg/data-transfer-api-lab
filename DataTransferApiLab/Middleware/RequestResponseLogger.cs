@@ -37,7 +37,7 @@ public class RequestResponseLogger
             newResponseBody.Seek(0, SeekOrigin.Begin);
             var responseBody = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
 
-            var sentResponse = JsonSerializer.Deserialize<TransferResponse>(responseBody, jsonOptions);
+            var sentResponse = JsonSerializer.Deserialize<TransferDto>(responseBody, jsonOptions);
 
             var audit = new Audit();
             audit.TransferName = sentResponse.TransferName;
@@ -67,7 +67,7 @@ public class RequestResponseLogger
             newResponseBody.Seek(0, SeekOrigin.Begin);
             var responseBody = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
 
-            var sentResponse = JsonSerializer.Deserialize<TransferDownloadResponse>(responseBody, jsonOptions);
+            var sentResponse = JsonSerializer.Deserialize<TransferDownloadDto>(responseBody, jsonOptions);
 
             var audit = new Audit();
             audit.TransferName = sentResponse.TransferName;
@@ -97,7 +97,7 @@ public class RequestResponseLogger
             newResponseBody.Seek(0, SeekOrigin.Begin);
             var responseBody = await new StreamReader(httpContext.Response.Body).ReadToEndAsync();
 
-            var sentResponse = JsonSerializer.Deserialize<TransferResponse>(responseBody, jsonOptions);
+            var sentResponse = JsonSerializer.Deserialize<TransferDto>(responseBody, jsonOptions);
 
             var audit = new Audit();
             audit.TransferName = sentResponse.TransferName;

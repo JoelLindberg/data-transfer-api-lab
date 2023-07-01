@@ -99,7 +99,7 @@ public class Program
             var version = request.HttpContext.GetRequestedApiVersion();
             var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/api/v{version}/transfer/{transfer.TransferDataId}");
 
-            var response = new TransferResponse();
+            var response = new TransferDto();
             response.TransferDataId = transfer.TransferDataId;
             response.TransferName = transfer.TransferName;
             response.Bytes = transfer.Bytes;
@@ -107,7 +107,7 @@ public class Program
             return Results.Json(response);
         })
         .Accepts<Transfer>("application/json")
-        .Produces<TransferResponse>(201)
+        .Produces<TransferDto>(201)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Send base64 encoded data",
@@ -121,15 +121,15 @@ public class Program
         // Download
         app.MapGet("/api/v{version:apiVersion}/transfer/{id}", async (int id, DataTransferApiLabContext db) => {
             Transfer transfer = await db.Transfers.FindAsync(id);
-            var transferDownloadResponse = new TransferDownloadResponse();
-            transferDownloadResponse.TransferDataId = transfer.TransferDataId;
-            transferDownloadResponse.TransferName = transfer.TransferName;
-            transferDownloadResponse.TransferData = Utils.Base64.Base64Encode(transfer.TransferData);
-            transferDownloadResponse.Bytes = transfer.Bytes;
+            var transferDownloadDto = new TransferDownloadDto();
+            transferDownloadDto.TransferDataId = transfer.TransferDataId;
+            transferDownloadDto.TransferName = transfer.TransferName;
+            transferDownloadDto.TransferData = Utils.Base64.Base64Encode(transfer.TransferData);
+            transferDownloadDto.Bytes = transfer.Bytes;
 
-            return Results.Json(transferDownloadResponse);
+            return Results.Json(transferDownloadDto);
         })
-        .Produces<TransferDownloadResponse>(200)
+        .Produces<TransferDownloadDto>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Fetch base64 encoded data",
@@ -162,7 +162,7 @@ public class Program
             var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName, i.Bytes }).ToListAsync();
             return Results.Json(transfers);
         })
-        .Produces<TransferResponse>(200)
+        .Produces<TransferDto>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "View all stored data",
@@ -192,7 +192,7 @@ public class Program
             var version = request.HttpContext.GetRequestedApiVersion();
             var location = new Uri($"{scheme}{Uri.SchemeDelimiter}{host}/api/v{version}/transfer/{transfer.TransferDataId}");
 
-            var response = new TransferResponse();
+            var response = new TransferDto();
             response.TransferDataId = transfer.TransferDataId;
             response.TransferName = transfer.TransferName;
             response.Bytes = transfer.Bytes;
@@ -200,7 +200,7 @@ public class Program
             return Results.Json(response);
         })
         .Accepts<Transfer>("application/json")
-        .Produces<TransferResponse>(201)
+        .Produces<TransferDto>(201)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Send base64 encoded data",
@@ -214,15 +214,15 @@ public class Program
         // Download
         app.MapGet("/api/v{version:apiVersion}/transfer/{id}", async (int id, DataTransferApiLabContext db) => {
             Transfer transfer = await db.Transfers.FindAsync(id);
-            var transferDownloadResponse = new TransferDownloadResponse();
-            transferDownloadResponse.TransferDataId = transfer.TransferDataId;
-            transferDownloadResponse.TransferName = transfer.TransferName;
-            transferDownloadResponse.TransferData = Utils.Base64.Base64Encode(transfer.TransferData);
-            transferDownloadResponse.Bytes = transfer.Bytes;
+            var transferDownloadDto = new TransferDownloadDto();
+            transferDownloadDto.TransferDataId = transfer.TransferDataId;
+            transferDownloadDto.TransferName = transfer.TransferName;
+            transferDownloadDto.TransferData = Utils.Base64.Base64Encode(transfer.TransferData);
+            transferDownloadDto.Bytes = transfer.Bytes;
 
-            return Results.Json(transferDownloadResponse);
+            return Results.Json(transferDownloadDto);
         })
-        .Produces<TransferDownloadResponse>(200)
+        .Produces<TransferDownloadDto>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Fetch base64 encoded data",
@@ -241,14 +241,14 @@ public class Program
             db.Remove(transfer);
             await db.SaveChangesAsync();
 
-            var transferResponse = new TransferResponse();
-            transferResponse.TransferDataId = transfer.TransferDataId;
-            transferResponse.TransferName = transfer.TransferName;
-            transferResponse.Bytes = transfer.Bytes;
+            var transferDto = new TransferDto();
+            transferDto.TransferDataId = transfer.TransferDataId;
+            transferDto.TransferName = transfer.TransferName;
+            transferDto.Bytes = transfer.Bytes;
 
-            return Results.Json(transferResponse);
+            return Results.Json(transferDto);
         })
-        .Produces<TransferResponse>(200)
+        .Produces<TransferDto>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "Remove stored transfer data",
@@ -281,7 +281,7 @@ public class Program
             var transfers = await db.Transfers.Select(i => new { i.TransferDataId, i.TransferName, i.Bytes }).ToListAsync();
             return Results.Json(transfers);
         })
-        .Produces<TransferResponse>(200)
+        .Produces<TransferDto>(200)
         .Produces(400)
         .WithOpenApi(operation => new(operation) {
             Summary = "View all stored data",

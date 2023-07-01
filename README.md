@@ -18,6 +18,8 @@ ASP.NET minimal API, with the following initial goal:
 
 ## Usage
 
+In order to run `dotnet ef` the tool must be installed. Install the tool globally: `dotnet tool install --global dotnet-ef`.
+
 1. `dotnet restore`
 2. `dotnet ef database update`
 3. `dotnet run`
